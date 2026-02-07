@@ -129,32 +129,53 @@ export const authConfig: NextAuthConfig = {
       return true
     },
     async jwt({ token, user, trigger, session }) {
+
+      const now = Date.now()
+
+      // This spreads the all the requests across a 60-second window
+      const baseInterval = 5 * 60 * 1000; // 5 minutes
+      const jitter = Math.random() * 60 * 1000; // Up to 60 seconds of random jitter
+      const VERIFICATION_INTERVAL = baseInterval + jitter;
+
       // Initial sign in
       if (user) {
         token.id = user.id
         token.role = user.role
         token.isActive = user.isActive
         token.authProvider = user.authProvider
+        token.lastVerified = now
       }
 
       // Refresh session data on update
       if (trigger === "update" && session) {
+        token.lastVerified = 0; // Reset timer to force a DB check on next line
         return { ...token, ...session.user }
       }
 
-      // Verify user still exists and is active
-      if (token.id) {
-        const dbUser = await prisma.user.findUnique({
-          where: { id: token.id as string },
-          select: { isActive: true, role: true },
-        })
+      // 3. Periodic Verification: Only query the DB if the interval has passed
+      const shouldVerify = !token.lastVerified || (now - (token.lastVerified as number)) > VERIFICATION_INTERVAL;
 
-        if (!dbUser || !dbUser.isActive) {
-          return {} // Force logout
+      if (token.id && shouldVerify) {
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: token.id as string },
+            select: { isActive: true, role: true },
+          });
+
+          if (!dbUser || !dbUser.isActive) {
+            return {}; // Force logout if user is gone or banned
+          }
+
+          // Update token with fresh DB data and new timestamp
+          token.role = dbUser.role;
+          token.isActive = dbUser.isActive;
+          token.lastVerified = now;
+
+          console.log(`Checking DB for user ${token.email} - next check in 5 mins`);
+        } catch (error) {
+          // If DB is down, fall back to existing token data to keep app running
+          console.error("Verification failed, using cached token data", error);
         }
-
-        token.role = dbUser.role
-        token.isActive = dbUser.isActive
       }
 
       return token
