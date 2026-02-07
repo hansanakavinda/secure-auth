@@ -31,13 +31,14 @@ export default function LoginPage() {
       })
 
       if (result?.error) {
-        setFormError(result.error)
+        console.log('Login error:', result)
+        setFormError(getErrorMessage(result.code ?? result.error) || result.error)
       } else if (result?.ok) {
         router.push(callbackUrl)
         router.refresh()
       }
     } catch (err) {
-      setFormError(`An unexpected error occurred: ${err}`)
+      setFormError('An unexpected error occurred. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -50,12 +51,18 @@ export default function LoginPage() {
 
   const getErrorMessage = (errorCode: string | null) => {
     switch (errorCode) {
+      case 'credentials':
+        return 'Invalid email or password.'
       case 'AccountDeactivated':
         return 'Your account has been deactivated. Please contact support.'
       case 'OAuthAccountNotLinked':
         return 'This email is already registered with a different provider.'
       case 'Callback':
         return 'Authentication failed. Please try again.'
+      case 'AccessDenied':
+        return 'Access denied. Please contact support if this persists.'
+      case 'Configuration':
+        return 'Authentication is temporarily unavailable. Please try again.'
       default:
         return null
     }

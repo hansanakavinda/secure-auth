@@ -1,4 +1,4 @@
-import NextAuth, { DefaultSession, NextAuthConfig } from "next-auth"
+import NextAuth, { DefaultSession, NextAuthConfig, CredentialsSignin } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import GoogleProvider from "next-auth/providers/google"
 import { PrismaAdapter } from "@auth/prisma-adapter"
@@ -22,6 +22,10 @@ declare module "next-auth" {
     isActive: boolean
     authProvider: "MANUAL" | "GOOGLE"
   }
+}
+
+class DeactivatedAccountError extends CredentialsSignin {
+  code = "AccountDeactivated"
 }
 
 export const authConfig: NextAuthConfig = {
@@ -60,7 +64,7 @@ export const authConfig: NextAuthConfig = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error("Email and password required")
+          return null
         }
 
         const user = await prisma.user.findUnique({
@@ -68,15 +72,15 @@ export const authConfig: NextAuthConfig = {
         })
 
         if (!user || !user.password) {
-          throw new Error("Invalid email or password")
+          return null
         }
 
         if (!user.isActive) {
-          throw new Error("Account is deactivated. Contact administrator.")
+          throw new DeactivatedAccountError()
         }
 
         if (user.authProvider !== "MANUAL") {
-          throw new Error(`This account uses ${user.authProvider} login. Please use that method.`)
+          return null
         }
 
         const isPasswordValid = await compare(
@@ -85,7 +89,7 @@ export const authConfig: NextAuthConfig = {
         )
 
         if (!isPasswordValid) {
-          throw new Error("Invalid email or password")
+          return null
         }
 
         return {
