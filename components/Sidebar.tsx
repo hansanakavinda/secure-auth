@@ -3,6 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { signOut } from 'next-auth/react'
 
 interface SidebarProps {
   userRole?: 'SUPER_ADMIN' | 'ADMIN' | 'USER'
@@ -111,14 +112,12 @@ export function Sidebar({ userRole, userName, userEmail }: SidebarProps) {
               <p className="text-xs text-gray-500 truncate">{userEmail}</p>
             </div>
           </div>
-          <form action="/api/auth/signout" method="POST" className="mt-2">
-            <button
-              type="submit"
-              className="w-full px-4 py-2 rounded-xl text-sm font-medium text-[#CC5500] hover:bg-[#F5F5F4] transition-colors duration-200"
-            >
-              Sign Out
-            </button>
-          </form>
+          <button
+            onClick={() => signOut({ callbackUrl: '/login' })}
+            className="w-full px-4 py-2 rounded-xl text-sm font-medium text-[#CC5500] hover:bg-[#F5F5F4] transition-colors duration-200 mt-2"
+          >
+            Sign Out
+          </button>
         </div>
       )}
     </aside>
