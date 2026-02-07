@@ -27,7 +27,7 @@ export function PostModerationActions({ postId }: PostModerationActionsProps) {
         alert('Failed to approve post')
       }
     } catch (error) {
-      alert('An error occurred')
+      alert(`An error occurred: ${error}`)
     } finally {
       setIsLoading(false)
     }
@@ -52,7 +52,7 @@ export function PostModerationActions({ postId }: PostModerationActionsProps) {
         alert('Failed to reject post')
       }
     } catch (error) {
-      alert('An error occurred')
+      alert(`An error occurred: ${error}`)
     } finally {
       setIsLoading(false)
     }

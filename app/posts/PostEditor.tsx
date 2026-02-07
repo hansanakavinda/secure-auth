@@ -42,7 +42,7 @@ export function PostEditor() {
         setError(data.error || 'Failed to create post')
       }
     } catch (err) {
-      setError('An unexpected error occurred')
+      setError(`An unexpected error occurred: ${err}`)
     } finally {
       setIsLoading(false)
     }

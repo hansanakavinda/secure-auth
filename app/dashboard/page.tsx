@@ -52,7 +52,7 @@ export default async function DashboardPage() {
             Welcome back, {session.user.name}!
           </h1>
           <p className="text-gray-600">
-            Here's what's happening with your account today.
+            Here&apos;s what&apos;s happening with your account today.
           </p>
         </div>
 
@@ -113,7 +113,7 @@ export default async function DashboardPage() {
           <CardContent>
             {userPosts.length === 0 ? (
               <div className="text-center py-8">
-                <p className="text-gray-500 mb-4">You haven't created any posts yet.</p>
+                <p className="text-gray-500 mb-4">You haven&apos;t created any posts yet.</p>
                 <a
                   href="/posts"
                   className="inline-flex items-center px-4 py-2 rounded-xl bg-[#CC5500] text-white hover:bg-[#B34C00] transition-colors"

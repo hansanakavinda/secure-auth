@@ -2,6 +2,7 @@ import NextAuth, { DefaultSession, NextAuthConfig } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import GoogleProvider from "next-auth/providers/google"
 import { PrismaAdapter } from "@auth/prisma-adapter"
+import type { Adapter } from "next-auth/adapters"
 import { prisma } from "@/lib/prisma"
 import { compare } from "bcryptjs"
 
@@ -24,7 +25,7 @@ declare module "next-auth" {
 }
 
 export const authConfig: NextAuthConfig = {
-  adapter: PrismaAdapter(prisma) as any,
+  adapter: PrismaAdapter(prisma) as Adapter,
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
@@ -101,7 +102,7 @@ export const authConfig: NextAuthConfig = {
     }),
   ],
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account }) {
       // Handle Google OAuth sign-in
       if (account?.provider === "google") {
         const existingUser = await prisma.user.findUnique({

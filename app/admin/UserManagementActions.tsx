@@ -4,10 +4,12 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { useRouter } from 'next/navigation'
 
+import { Role } from '@/types/auth'
+
 interface UserManagementActionsProps {
   userId: string
   userEmail: string
-  currentRole: 'SUPER_ADMIN' | 'ADMIN' | 'USER'
+  currentRole: Role
   isActive: boolean
   isCurrentUser: boolean
 }
@@ -46,13 +48,13 @@ export function UserManagementActions({
         alert('Failed to update user status')
       }
     } catch (error) {
-      alert('An error occurred')
+      alert(`An error occurred: ${error}`)
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleChangeRole = async (newRole: 'SUPER_ADMIN' | 'ADMIN' | 'USER') => {
+  const handleChangeRole = async (newRole: Role) => {
     if (isCurrentUser && newRole !== 'SUPER_ADMIN') {
       alert('You cannot change your own role')
       return
@@ -76,7 +78,7 @@ export function UserManagementActions({
         alert('Failed to update user role')
       }
     } catch (error) {
-      alert('An error occurred')
+      alert(`An error occurred: ${error}`)
     } finally {
       setIsLoading(false)
     }
@@ -87,7 +89,7 @@ export function UserManagementActions({
       <select
         className="px-3 py-1.5 text-sm rounded-lg border border-[#E5E5E4] bg-white text-[#4B3621] focus:outline-none focus:ring-2 focus:ring-[#CC5500] disabled:opacity-50"
         value={currentRole}
-        onChange={(e) => handleChangeRole(e.target.value as any)}
+        onChange={(e) => handleChangeRole(e.target.value as Role)}
         disabled={isLoading || isCurrentUser}
       >
         <option value="USER">User</option>
