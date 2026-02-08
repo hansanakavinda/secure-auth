@@ -1,11 +1,9 @@
 import { prisma } from '@/lib/prisma'
-import { isValidEmail } from '@/lib/utils'
 import { requireAuth } from '@/lib/api-auth'
-import { asyncCatcher } from '@/lib/api-utils'
+import { asyncCatcher, validateRequest } from '@/lib/api-utils'
+import { createUserSchema } from '@/lib/validators/admin-users'
 import { NextResponse } from 'next/server'
 import { hash } from 'bcryptjs'
-
-const MIN_PASSWORD_LENGTH = 8
 
 export const POST = asyncCatcher(async (request: Request) => {
   const authResult = await requireAuth({ roles: ['SUPER_ADMIN'] })
@@ -13,23 +11,7 @@ export const POST = asyncCatcher(async (request: Request) => {
     return authResult.response
   }
 
-  const { name, email, password, role } = await request.json()
-
-  if (!name || !email || !password || !role) {
-    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
-  }
-
-  if (!isValidEmail(email)) {
-    return NextResponse.json({ error: 'Invalid email address' }, { status: 400 })
-  }
-
-  if (typeof password !== 'string' || password.length < MIN_PASSWORD_LENGTH) {
-    return NextResponse.json({ error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters` }, { status: 400 })
-  }
-
-  if (!['USER', 'ADMIN', 'SUPER_ADMIN'].includes(role)) {
-    return NextResponse.json({ error: 'Invalid role' }, { status: 400 })
-  }
+  const { name, email, password, role } = await validateRequest(request, createUserSchema)
 
   const existingUser = await prisma.user.findUnique({
     where: { email },

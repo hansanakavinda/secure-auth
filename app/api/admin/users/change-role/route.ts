@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/api-auth'
-import { asyncCatcher } from '@/lib/api-utils'
+import { asyncCatcher, validateRequest } from '@/lib/api-utils'
+import { changeRoleSchema } from '@/lib/validators/admin-users'
 import { NextResponse } from 'next/server'
 
 export const POST = asyncCatcher(async (request: Request) => {
@@ -9,11 +10,7 @@ export const POST = asyncCatcher(async (request: Request) => {
     return authResult.response
   }
 
-  const { userId, role } = await request.json()
-
-  if (!userId || !['USER', 'ADMIN', 'SUPER_ADMIN'].includes(role)) {
-    return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
-  }
+  const { userId, role } = await validateRequest(request, changeRoleSchema)
 
   await prisma.user.update({
     where: { id: userId },

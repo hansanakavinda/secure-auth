@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/api-auth'
-import { asyncCatcher } from '@/lib/api-utils'
+import { asyncCatcher, validateRequest } from '@/lib/api-utils'
+import { moderatePostSchema } from '@/lib/validators/admin-posts'
 import { NextResponse } from 'next/server'
 
 export const POST = asyncCatcher(async (request: Request) => {
@@ -9,11 +10,7 @@ export const POST = asyncCatcher(async (request: Request) => {
     return authResult.response
   }
 
-  const { postId, action } = await request.json()
-
-  if (!postId || !['approve', 'reject'].includes(action)) {
-    return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
-  }
+  const { postId, action } = await validateRequest(request, moderatePostSchema)
 
   if (action === 'approve') {
     await prisma.post.update({

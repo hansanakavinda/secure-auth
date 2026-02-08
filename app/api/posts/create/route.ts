@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/api-auth'
-import { asyncCatcher } from '@/lib/api-utils'
+import { asyncCatcher, validateRequest } from '@/lib/api-utils'
+import { createPostSchema } from '@/lib/validators/posts'
 import { NextResponse } from 'next/server'
 
 export const POST = asyncCatcher(async (request: Request) => {
@@ -10,19 +11,7 @@ export const POST = asyncCatcher(async (request: Request) => {
   }
   const { session } = authResult
 
-  const { title, content } = await request.json()
-
-  if (!title?.trim() || !content?.trim()) {
-    return NextResponse.json({ error: 'Title and content are required' }, { status: 400 })
-  }
-
-  if (title.length > 200) {
-    return NextResponse.json({ error: 'Title must be 200 characters or less' }, { status: 400 })
-  }
-
-  if (content.length > 5000) {
-    return NextResponse.json({ error: 'Content must be 5000 characters or less' }, { status: 400 })
-  }
+  const { title, content } = await validateRequest(request, createPostSchema)
 
   const post = await prisma.post.create({
     data: {

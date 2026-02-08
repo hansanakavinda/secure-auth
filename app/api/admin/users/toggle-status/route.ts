@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/api-auth'
-import { asyncCatcher } from '@/lib/api-utils'
+import { asyncCatcher, validateRequest } from '@/lib/api-utils'
+import { toggleStatusSchema } from '@/lib/validators/admin-users'
 import { NextResponse } from 'next/server'
 
 export const POST = asyncCatcher(async (request: Request) => {
@@ -10,11 +11,7 @@ export const POST = asyncCatcher(async (request: Request) => {
   }
   const { session } = authResult
 
-  const { userId, isActive } = await request.json()
-
-  if (!userId || typeof isActive !== 'boolean') {
-    return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
-  }
+  const { userId, isActive } = await validateRequest(request, toggleStatusSchema)
 
   // Prevent self-deactivation
   if (userId === session.user.id && !isActive) {
