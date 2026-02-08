@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Secure Auth V2 - Earthy Modern Dashboard",
+  title: "Secure Auth V2 ",
   description: "Next.js authentication system with role-based access control",
 };
 
