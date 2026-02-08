@@ -1,6 +1,6 @@
-import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { isValidEmail } from '@/lib/utils'
+import { requireAuth } from '@/lib/api-auth'
 import { NextResponse } from 'next/server'
 import { hash } from 'bcryptjs'
 
@@ -8,10 +8,9 @@ const MIN_PASSWORD_LENGTH = 8
 
 export async function POST(request: Request) {
   try {
-    const session = await auth()
-
-    if (!session || session.user.role !== 'SUPER_ADMIN') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+    const authResult = await requireAuth({ roles: ['SUPER_ADMIN'] })
+    if ('response' in authResult) {
+      return authResult.response
     }
 
     const { name, email, password, role } = await request.json()

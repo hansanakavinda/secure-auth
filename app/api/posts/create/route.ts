@@ -1,14 +1,14 @@
-import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { requireAuth } from '@/lib/api-auth'
 import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
   try {
-    const session = await auth()
-
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const authResult = await requireAuth({ status: 401 })
+    if ('response' in authResult) {
+      return authResult.response
     }
+    const { session } = authResult
 
     const { title, content } = await request.json()
 
