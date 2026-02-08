@@ -43,13 +43,15 @@ export default async function PostsPage() {
               <h1 className="text-4xl font-bold text-[#4B3621] mb-2">Public Post Wall</h1>
               <p className="text-gray-600">Share your thoughts with the community</p>
             </div>
-            {session && <PostEditor /> && (
-              <div className="mb-6 p-4 rounded-xl bg-blue-50 border border-blue-200">
+            {session && <div className='flex gap-4 items-center'>
+              <PostEditor />
+              <div className=" p-4 rounded-xl bg-blue-50 border border-blue-200 ">
                 <p className="text-sm text-blue-800">
                   <a href="/dashboard" className="font-semibold underline">Dashboard</a>
                 </p>
               </div>
-            )}
+            </div>}
+
             {!session && (
               <div className="mb-6 p-4 rounded-xl bg-blue-50 border border-blue-200">
                 <p className="text-sm text-blue-800">

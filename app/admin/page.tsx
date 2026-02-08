@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/Badge'
 import { prisma } from '@/lib/prisma'
 import { UserManagementActions } from './UserManagementActions'
+import { AddUserForm } from '@/components/user/AddUserForm'
 
 export default async function AdminPage() {
   const session = await auth()
@@ -44,11 +45,14 @@ export default async function AdminPage() {
 
       <main className="flex-1 ml-64 p-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-[#4B3621] mb-2">User Management</h1>
-          <p className="text-gray-600">
-            Manage user roles, status, and view activity logs
-          </p>
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h1 className="text-4xl font-bold text-[#4B3621] mb-2">User Management</h1>
+            <p className="text-gray-600">
+              Manage user roles, status, and view activity logs
+            </p>
+          </div>
+          <AddUserForm />
         </div>
 
         {/* Stats Grid */}
