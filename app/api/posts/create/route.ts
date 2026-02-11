@@ -1,26 +1,15 @@
-import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/api-auth'
 import { asyncCatcher, validateRequest } from '@/lib/api-utils'
 import { createPostSchema } from '@/lib/validators/posts'
+import { createPost } from '@/data-access/posts'
 import { NextResponse } from 'next/server'
 
 export const POST = asyncCatcher(async (request: Request) => {
-  const authResult = await requireAuth({ status: 401 })
-  if ('response' in authResult) {
-    return authResult.response
-  }
-  const { session } = authResult
+  const session = await requireAuth()
 
   const { title, content } = await validateRequest(request, createPostSchema)
 
-  const post = await prisma.post.create({
-    data: {
-      title: title.trim(),
-      content: content.trim(),
-      authorId: session.user.id,
-      isApproved: false, // Requires moderation
-    },
-  })
+  const result = await createPost({ title, content, authorId: session.user.id })
 
-  return NextResponse.json({ success: true, post })
+  return NextResponse.json(result)
 }, 'Create post')

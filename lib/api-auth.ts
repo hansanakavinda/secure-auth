@@ -1,28 +1,23 @@
-import { NextResponse } from 'next/server'
 import type { Session } from 'next-auth'
 import type { Role } from '@/types/auth'
 import { auth } from '@/lib/auth'
+import { ApiError } from '@/lib/api-utils'
 
 interface RequireAuthOptions {
   roles?: Role[]
-  status?: number
 }
 
-type RequireAuthResult =
-  | { session: Session }
-  | { response: NextResponse }
-
-export async function requireAuth(options: RequireAuthOptions = {}): Promise<RequireAuthResult> {
-  const { roles, status = 403 } = options
+export async function requireAuth(options: RequireAuthOptions = {}): Promise<Session> {
+  const { roles } = options
   const session = await auth()
 
   if (!session) {
-    return { response: NextResponse.json({ error: 'Unauthorized' }, { status }) }
+    throw new ApiError('Unauthorized', 401)
   }
 
   if (roles?.length && !roles.includes(session.user.role)) {
-    return { response: NextResponse.json({ error: 'Unauthorized' }, { status }) }
+    throw new ApiError('Forbidden', 403)
   }
 
-  return { session }
+  return session
 }
