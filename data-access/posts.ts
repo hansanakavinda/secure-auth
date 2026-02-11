@@ -74,11 +74,32 @@ export const getApprovedPosts = async () => {
     return posts
 }
 
-export const getUserPosts = async (userId: string, options?: { take?: number }) => {
+export const getUserPosts = async (userId: string, options?: { take?: number; skip?: number }) => {
     const posts = await prisma.post.findMany({
         where: { authorId: userId },
         orderBy: { createdAt: 'desc' },
         ...(options?.take && { take: options.take }),
+        ...(options?.skip && { skip: options.skip }),
+    })
+
+    return posts
+}
+
+export const getApprovedPostsPaginated = async (options?: { take?: number; skip?: number }) => {
+    const posts = await prisma.post.findMany({
+        where: { isApproved: true },
+        include: {
+            author: {
+                select: {
+                    name: true,
+                    email: true,
+                    role: true,
+                },
+            },
+        },
+        orderBy: { createdAt: 'desc' },
+        take: options?.take ?? 4,
+        skip: options?.skip ?? 0,
     })
 
     return posts
