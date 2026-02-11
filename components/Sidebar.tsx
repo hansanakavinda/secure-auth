@@ -113,7 +113,7 @@ export function Sidebar({ userRole, userName, userEmail }: SidebarProps) {
             </div>
           </div>
           <button
-            onClick={() => signOut({ callbackUrl: '/login' })}
+            onClick={() => signOut({ redirectTo: '/login' })}
             className="w-full px-4 py-2 rounded-xl text-sm font-medium text-[#CC5500] hover:bg-[#F5F5F4] transition-colors duration-200 mt-2"
           >
             Sign Out

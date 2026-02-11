@@ -63,45 +63,52 @@ export const authConfig: NextAuthConfig = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+
         if (!credentials?.email || !credentials?.password) {
           return null
         }
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email as string },
-        })
+        try {
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email as string },
+          })
 
-        if (!user || !user.password) {
+          if (!user || !user.password) {
+            return null
+          }
+
+          if (!user.isActive) {
+            throw new DeactivatedAccountError()
+          }
+
+          if (user.authProvider !== "MANUAL") {
+            return null
+          }
+
+          const isPasswordValid = await compare(
+            credentials.password as string,
+            user.password
+          )
+
+          if (!isPasswordValid) {
+            return null
+          }
+
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            image: user.image,
+            role: user.role,
+            isActive: user.isActive,
+            authProvider: user.authProvider,
+            emailVerified: user.emailVerified,
+          }
+        }
+        catch (err) {
           return null
         }
 
-        if (!user.isActive) {
-          throw new DeactivatedAccountError()
-        }
-
-        if (user.authProvider !== "MANUAL") {
-          return null
-        }
-
-        const isPasswordValid = await compare(
-          credentials.password as string,
-          user.password
-        )
-
-        if (!isPasswordValid) {
-          return null
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          image: user.image,
-          role: user.role,
-          isActive: user.isActive,
-          authProvider: user.authProvider,
-          emailVerified: user.emailVerified,
-        }
       },
     }),
   ],

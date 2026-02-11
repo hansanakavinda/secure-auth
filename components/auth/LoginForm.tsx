@@ -46,7 +46,7 @@ export function LoginForm() {
 
     const handleGoogleLogin = async () => {
         setIsLoading(true)
-        await signIn('google', { callbackUrl })
+        await signIn('google', { redirectTo: callbackUrl })
     }
 
     const getErrorMessage = (errorCode: string | null) => {
