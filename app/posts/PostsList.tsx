@@ -156,7 +156,7 @@ export function PostsList({ initialPosts }: PostsListProps) {
       {/* End of Posts */}
       {!hasMore && posts.length > 0 && (
         <div className="text-center py-8">
-          <p className="text-sm text-gray-500">You've reached the end! 🎉</p>
+          <p className="text-sm text-gray-500">You&apos;ve reached the end! 🎉</p>
         </div>
       )}
     </>
