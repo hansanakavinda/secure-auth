@@ -116,16 +116,35 @@ export const authConfig: NextAuthConfig = {
     async signIn({ user, account }) {
       // Handle Google OAuth sign-in
       if (account?.provider === "google") {
-        const existingUser = await prisma.user.findUnique({
-          where: { email: user.email! },
-        })
-
-        // Prevent account hijacking: if email exists with different provider, deny
-        if (existingUser && existingUser.authProvider !== "GOOGLE") {
-          return false // Deny sign-in
+        if (!user.email) {
+          console.error("OAuth sign-in denied: no email provided by provider")
+          return false
         }
 
-        // Update or create user
+        const existingUser = await prisma.user.findUnique({
+          where: { email: user.email },
+        })
+
+        // SECURITY: Strictly block OAuth if a MANUAL account exists with this email.
+        // This prevents OAuth account hijacking where an attacker could claim
+        // an existing manual account by signing in with a matching OAuth email.
+        if (existingUser && existingUser.authProvider === "MANUAL") {
+          console.warn(
+            `OAuth sign-in BLOCKED: email ${user.email} is registered as a MANUAL account. ` +
+            `OAuth provider cannot claim this account.`
+          )
+          return false
+        }
+
+        // SECURITY: Block sign-in if the existing OAuth account has been deactivated
+        if (existingUser && !existingUser.isActive) {
+          console.warn(
+            `OAuth sign-in BLOCKED: account ${user.email} has been deactivated.`
+          )
+          return false
+        }
+
+        // Update existing OAuth user profile data
         if (existingUser) {
           await prisma.user.update({
             where: { id: existingUser.id },
@@ -140,16 +159,16 @@ export const authConfig: NextAuthConfig = {
 
       return true
     },
-    async jwt({ token, user, trigger, session }) {
+    async jwt({ token, user, trigger }) {
 
       const now = Date.now()
 
-      // This spreads the all the requests across a 60-second window
+      // Spread DB verification requests across a window to avoid thundering herd
       const baseInterval = 5 * 60 * 1000; // 5 minutes
       const jitter = Math.random() * 60 * 1000; // Up to 60 seconds of random jitter
       const VERIFICATION_INTERVAL = baseInterval + jitter;
 
-      // Initial sign in
+      // Initial sign in — populate token from the authenticated user object
       if (user) {
         token.id = user.id
         token.role = user.role
@@ -158,35 +177,38 @@ export const authConfig: NextAuthConfig = {
         token.lastVerified = now
       }
 
-      // Refresh session data on update
-      if (trigger === "update" && session) {
-        token.lastVerified = 0; // Reset timer to force a DB check on next line
-        return { ...token, ...session.user }
+      // SECURITY FIX: On session update trigger, NEVER trust client-supplied data.
+      // Instead, force an immediate DB re-fetch to get the real role and status.
+      // The old code did `return { ...token, ...session.user }` which allowed
+      // a malicious client to escalate their role via the update() call.
+      if (trigger === "update") {
+        token.lastVerified = 0; // Force DB verification on the next check below
       }
 
-      // 3. Periodic Verification: Only query the DB if the interval has passed
+      // Periodic Verification: Only query the DB if the interval has passed
       const shouldVerify = !token.lastVerified || (now - (token.lastVerified as number)) > VERIFICATION_INTERVAL;
 
       if (token.id && shouldVerify) {
         try {
           const dbUser = await prisma.user.findUnique({
             where: { id: token.id as string },
-            select: { isActive: true, role: true },
+            select: { isActive: true, role: true, authProvider: true },
           });
 
           if (!dbUser || !dbUser.isActive) {
-            return {}; // Force logout if user is gone or banned
+            // Force logout if user is deleted or deactivated
+            return {};
           }
 
-          // Update token with fresh DB data and new timestamp
+          // Update token ONLY with DB-sourced data — never client data
           token.role = dbUser.role;
           token.isActive = dbUser.isActive;
+          token.authProvider = dbUser.authProvider;
           token.lastVerified = now;
-
-          console.log(`Checking DB for user ${token.email} - next check in 5 mins`);
         } catch (error) {
-          // If DB is down, fall back to existing token data to keep app running
-          console.error("Verification failed, using cached token data", error);
+          // If DB is down, fall back to existing token data to keep app running.
+          // This is acceptable since the token was originally DB-sourced.
+          console.error("Periodic verification failed, using cached token data", error);
         }
       }
 

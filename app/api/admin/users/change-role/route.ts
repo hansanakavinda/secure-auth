@@ -1,11 +1,12 @@
-import { requireAuth } from '@/lib/api-auth'
+import { requireFreshAuth } from '@/lib/auth-checks'
 import { asyncCatcher, validateRequest } from '@/lib/api-utils'
 import { changeRoleSchema } from '@/lib/validators/admin-users'
 import { changeUserRole } from '@/data-access/users'
 import { NextResponse } from 'next/server'
 
 export const POST = asyncCatcher(async (request: Request) => {
-  await requireAuth({ roles: ['SUPER_ADMIN'] })
+  // SECURITY: Uses fresh DB check — not cached JWT — for role changes
+  await requireFreshAuth({ roles: ['SUPER_ADMIN'] })
 
   const { userId, role } = await validateRequest(request, changeRoleSchema)
 
