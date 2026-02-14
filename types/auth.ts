@@ -5,18 +5,13 @@ import { DefaultSession } from "next-auth"
 // Extend Next-Auth types
 declare module "next-auth" {
   interface Session {
-    user: {
-      id: string
-      role: "SUPER_ADMIN" | "ADMIN" | "USER"
-      isActive: boolean
-      authProvider: "MANUAL" | "GOOGLE"
-    } & DefaultSession["user"]
+    user: User & DefaultSession["user"]
   }
 
   interface User {
-    role: "SUPER_ADMIN" | "ADMIN" | "USER"
+    role: Role
     isActive: boolean
-    authProvider: "MANUAL" | "GOOGLE"
+    authProvider: AuthProvider
   }
 }
 
@@ -31,29 +26,3 @@ export interface RolePermissions {
   canAccessAdmin: boolean
 }
 
-// Helper function to check permissions
-export function getRolePermissions(role: Role): RolePermissions {
-  switch (role) {
-    case "SUPER_ADMIN":
-      return {
-        canCreatePost: true,
-        canModeratePost: true,
-        canManageUsers: true,
-        canAccessAdmin: true,
-      }
-    case "ADMIN":
-      return {
-        canCreatePost: true,
-        canModeratePost: true,
-        canManageUsers: false,
-        canAccessAdmin: true,
-      }
-    case "USER":
-      return {
-        canCreatePost: true,
-        canModeratePost: false,
-        canManageUsers: false,
-        canAccessAdmin: false,
-      }
-  }
-}

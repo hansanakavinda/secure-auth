@@ -6,23 +6,23 @@ import type { Adapter } from "next-auth/adapters"
 import { prisma } from "@/lib/prisma"
 import { compare } from "bcryptjs"
 
-// Extend the built-in session types
-declare module "next-auth" {
-  interface Session {
-    user: {
-      id: string
-      role: "SUPER_ADMIN" | "ADMIN" | "USER"
-      isActive: boolean
-      authProvider: "MANUAL" | "GOOGLE"
-    } & DefaultSession["user"]
-  }
+// // Extend the built-in session types
+// declare module "next-auth" {
+//   interface Session {
+//     user: {
+//       id: string
+//       role: "SUPER_ADMIN" | "ADMIN" | "USER"
+//       isActive: boolean
+//       authProvider: "MANUAL" | "GOOGLE"
+//     } & DefaultSession["user"]
+//   }
 
-  interface User {
-    role: "SUPER_ADMIN" | "ADMIN" | "USER"
-    isActive: boolean
-    authProvider: "MANUAL" | "GOOGLE"
-  }
-}
+//   interface User {
+//     role: "SUPER_ADMIN" | "ADMIN" | "USER"
+//     isActive: boolean
+//     authProvider: "MANUAL" | "GOOGLE"
+//   }
+// }
 
 class DeactivatedAccountError extends CredentialsSignin {
   code = "AccountDeactivated"

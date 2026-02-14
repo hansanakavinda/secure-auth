@@ -1,12 +1,12 @@
 'use client'
 
-import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
+import { Role } from '@/types/auth'
 
 interface SidebarProps {
-  userRole?: 'SUPER_ADMIN' | 'ADMIN' | 'USER'
+  userRole?: Role
   userName?: string
   userEmail?: string
 }

@@ -10,9 +10,11 @@ import { UserRoleTabs } from '@/components/user/UserRoleTabs'
 export default async function AdminPage() {
   const session = await auth()
 
-  if (!session || session.user.role !== 'SUPER_ADMIN') {
+  if (!session || session.user.role !== 'SUPER_ADMIN' || !session.user.id) {
     redirect('/dashboard')
   }
+
+  const userId = session.user.id 
 
   // Fetch all users
   const users = await prisma.user.findMany({
@@ -96,7 +98,7 @@ export default async function AdminPage() {
           </Card>
         </div>
 
-        <UserRoleTabs users={users} currentUserId={session.user.id} />
+        <UserRoleTabs users={users} currentUserId={userId} />
       </main>
     </div>
   )
