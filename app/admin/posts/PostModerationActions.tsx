@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { useRouter } from 'next/navigation'
+import { ApiClient } from '@/lib/api-client'
 
 interface PostModerationActionsProps {
   postId: string
@@ -15,19 +16,16 @@ export function PostModerationActions({ postId }: PostModerationActionsProps) {
   const handleApprove = async () => {
     setIsLoading(true)
     try {
-      const response = await fetch('/api/admin/posts/moderate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ postId, action: 'approve' }),
+      const result = await ApiClient.post('/api/admin/posts/moderate', {
+        postId,
+        action: 'approve',
       })
 
-      if (response.ok) {
+      if (result.ok) {
         router.refresh()
       } else {
-        alert('Failed to approve post')
+        alert(result.error || 'Failed to approve post')
       }
-    } catch (error) {
-      alert(`An error occurred: ${error}`)
     } finally {
       setIsLoading(false)
     }
@@ -40,19 +38,16 @@ export function PostModerationActions({ postId }: PostModerationActionsProps) {
 
     setIsLoading(true)
     try {
-      const response = await fetch('/api/admin/posts/moderate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ postId, action: 'reject' }),
+      const result = await ApiClient.post('/api/admin/posts/moderate', {
+        postId,
+        action: 'reject',
       })
 
-      if (response.ok) {
+      if (result.ok) {
         router.refresh()
       } else {
-        alert('Failed to reject post')
+        alert(result.error || 'Failed to reject post')
       }
-    } catch (error) {
-      alert(`An error occurred: ${error}`)
     } finally {
       setIsLoading(false)
     }
