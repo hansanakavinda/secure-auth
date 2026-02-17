@@ -5,6 +5,8 @@ import { PrismaAdapter } from "@auth/prisma-adapter"
 import type { Adapter } from "next-auth/adapters"
 import { prisma } from "@/lib/prisma"
 import { compare } from "bcryptjs"
+import { headers } from "next/headers"
+import { limiter, RateLimitError } from "@/lib/limiter"
 
 class DeactivatedAccountError extends CredentialsSignin {
   code = "AccountDeactivated"
@@ -51,7 +53,16 @@ export const authConfig: NextAuthConfig = {
           return null
         }
 
+        // Extract client IP from reverse-proxy header, fallback for local dev
+        const headerStore = await headers()
+        const forwarded = headerStore.get("x-forwarded-for")
+        const ip = forwarded?.split(",")[0].trim() || "127.0.0.1"
+
         try {
+          // SECURITY: Rate-limit check BEFORE password comparison
+          // to mitigate timing attacks and brute-force attempts.
+          limiter.check(ip, credentials.email as string)
+
           const user = await prisma.user.findUnique({
             where: { email: credentials.email as string },
           })
@@ -89,6 +100,10 @@ export const authConfig: NextAuthConfig = {
           }
         }
         catch (err) {
+          // Re-throw RateLimitError so NextAuth surfaces it on the error page
+          if (err instanceof RateLimitError) throw err
+          // Re-throw DeactivatedAccountError for deactivated-account UX
+          if (err instanceof DeactivatedAccountError) throw err
           return null
         }
 
@@ -208,6 +223,20 @@ export const authConfig: NextAuthConfig = {
       session.user.authProvider = token.authProvider as "MANUAL" | "GOOGLE"
 
       return session
+    },
+  },
+  logger: {
+    error(error) {
+      // Auth.js v5 logs all CredentialsSignin throws as [auth][error].
+      // Our subclasses (RateLimitError, DeactivatedAccountError) are intentional
+      // security control-flow, not operational errors.
+      // Check `type` instead of `name` — class names get mangled by bundlers
+      // in production, but Auth.js sets `type` explicitly on every instance.
+      if ("type" in error && error.type === "CredentialsSignin") {
+        console.warn("[auth][knownError]", error.name)
+        return
+      }
+      console.error("[auth][error]", error)
     },
   },
   events: {

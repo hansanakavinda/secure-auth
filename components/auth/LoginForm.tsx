@@ -53,8 +53,12 @@ export function LoginForm() {
         switch (errorCode) {
             case 'credentials':
                 return 'Invalid email or password.'
+            case 'CredentialsSignin':
+                return 'Invalid email or password.'
             case 'AccountDeactivated':
                 return 'Your account has been deactivated. Please contact support.'
+            case 'RateLimited':
+                return 'Too many login attempts. Please wait a few minutes and try again.'
             case 'OAuthAccountNotLinked':
                 return 'This email is already registered with a different provider.'
             case 'Callback':
