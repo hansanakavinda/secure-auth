@@ -11,6 +11,7 @@ class DeactivatedAccountError extends CredentialsSignin {
 }
 
 export const authConfig: NextAuthConfig = {
+  trustHost: true,
   adapter: PrismaAdapter(prisma) as Adapter,
   session: {
     strategy: "jwt",
@@ -197,12 +198,14 @@ export const authConfig: NextAuthConfig = {
       return token
     },
     async session({ session, token }) {
-      if (token && session.user) {
-        session.user.id = token.id as string
-        session.user.role = token.role as "SUPER_ADMIN" | "ADMIN" | "USER"
-        session.user.isActive = token.isActive as boolean
-        session.user.authProvider = token.authProvider as "MANUAL" | "GOOGLE"
+      if (!token || !session.user) {
+        return session
       }
+
+      session.user.id = token.id as string
+      session.user.role = token.role as "SUPER_ADMIN" | "ADMIN" | "USER"
+      session.user.isActive = token.isActive as boolean
+      session.user.authProvider = token.authProvider as "MANUAL" | "GOOGLE"
 
       return session
     },
