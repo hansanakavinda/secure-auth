@@ -1,4 +1,5 @@
 import { auth } from '@/lib/auth'
+import getSession from '@/lib/getSession'
 import { redirect } from 'next/navigation'
 import { Sidebar } from '@/components/Sidebar'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card'
@@ -6,7 +7,7 @@ import { Badge } from '@/components/ui/Badge'
 import { prisma } from '@/lib/prisma'
 
 export default async function DashboardPage() {
-  const session = await auth()
+  const session = await getSession()
 
   if (!session) {
     redirect('/login')

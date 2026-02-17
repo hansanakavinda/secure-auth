@@ -19,10 +19,3 @@ declare module "next-auth" {
 export type Role = "SUPER_ADMIN" | "ADMIN" | "USER"
 export type AuthProvider = "MANUAL" | "GOOGLE"
 
-export interface RolePermissions {
-  canCreatePost: boolean
-  canModeratePost: boolean
-  canManageUsers: boolean
-  canAccessAdmin: boolean
-}
-

@@ -1,4 +1,5 @@
 import { auth } from '@/lib/auth'
+import getSession from '@/lib/getSession'
 import { redirect } from 'next/navigation'
 import { Sidebar } from '@/components/Sidebar'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card'
@@ -8,7 +9,7 @@ import { AddUserForm } from '@/components/user/AddUserForm'
 import { UserRoleTabs } from '@/components/user/UserRoleTabs'
 
 export default async function AdminPage() {
-  const session = await auth()
+  const session = await getSession()
 
   if (!session || session.user.role !== 'SUPER_ADMIN' || !session.user.id) {
     redirect('/dashboard')

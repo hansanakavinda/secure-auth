@@ -1,4 +1,5 @@
 import { auth } from '@/lib/auth'
+import getSession from '@/lib/getSession'
 import { redirect } from 'next/navigation'
 import { Sidebar } from '@/components/Sidebar'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card'
@@ -7,7 +8,7 @@ import { prisma } from '@/lib/prisma'
 import { PostModerationActions } from './PostModerationActions'
 
 export default async function AdminPostsPage() {
-  const session = await auth()
+  const session = await getSession()
 
   if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPER_ADMIN')) {
     redirect('/dashboard')

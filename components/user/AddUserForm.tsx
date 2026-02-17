@@ -7,6 +7,9 @@ import { Input } from '@/components/ui/Input'
 import { Modal } from '@/components/ui/Modal'
 import type { Role } from '@/types/auth'
 
+// example
+import { createUserAction } from '@/lib/actions/users'
+
 const roles: Role[] = ['USER', 'ADMIN', 'SUPER_ADMIN']
 
 export function AddUserForm() {
@@ -39,17 +42,31 @@ export function AddUserForm() {
     setError('')
 
     try {
-      const response = await fetch('/api/admin/users/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password, role }),
-      })
 
-      if (!response.ok) {
-        const payload = await response.json().catch(() => null)
-        setError(payload?.error || 'Failed to create user')
+      const formData = new FormData()
+      formData.append('name', name)
+      formData.append('email', email)
+      formData.append('password', password)
+      formData.append('role', role)
+
+      const result = await createUserAction(formData)
+
+      if (!result.success) {
+        setError(result.error || 'Failed to create user')
         return
       }
+
+      // const response = await fetch('/api/admin/users/create', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ name, email, password, role }),
+      // })
+
+      // if (!response.ok) {
+      //   const payload = await response.json().catch(() => null)
+      //   setError(payload?.error || 'Failed to create user')
+      //   return
+      // }
 
       handleClose()
       router.refresh()
