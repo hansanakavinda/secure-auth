@@ -1,7 +1,7 @@
 import type { Session } from 'next-auth'
 import type { Role } from '@/types/auth'
 import { auth } from '@/lib/auth'
-import { ApiError } from '@/lib/api-utils'
+import { ApiError } from '@/lib/api/api-utils'
 
 interface RequireAuthOptions {
   roles?: Role[]

@@ -1,4 +1,4 @@
-import { ApiError } from "@/lib/api-utils"
+import { ApiError } from "@/lib/api/api-utils"
 import { prisma } from "@/lib/prisma"
 import { hash } from "bcryptjs"
 import type { Role } from '@/types/auth'

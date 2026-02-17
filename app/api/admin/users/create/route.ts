@@ -1,7 +1,7 @@
-import { asyncCatcher, validateRequest } from '@/lib/api-utils'
+import { asyncCatcher, validateRequest } from '@/lib/api/api-utils'
 import { createUser } from '@/data-access/users'
 import { NextResponse } from 'next/server'
-import { requireFreshAuth } from '@/lib/auth-checks'
+import { requireFreshAuth } from '@/lib/api/auth-checks'
 import { createUserSchema } from '@/lib/validators/admin-users'
 
 export const POST = asyncCatcher(async (request: Request) => {

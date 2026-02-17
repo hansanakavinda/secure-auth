@@ -1,7 +1,7 @@
 'use server'
 
 import { createUser } from '@/data-access/users'
-import { ApiError } from '@/lib/api-utils'
+import { ApiError } from '@/lib/api/api-utils'
 import type { Role } from '@/types/auth'
 
 export async function createUserAction(formData: FormData) {

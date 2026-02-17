@@ -1,5 +1,5 @@
-import { requireAuth } from '@/lib/api-auth'
-import { asyncCatcher, validateRequest } from '@/lib/api-utils'
+import { requireAuth } from '@/lib/api/api-auth'
+import { asyncCatcher, validateRequest } from '@/lib/api/api-utils'
 import { createPostSchema } from '@/lib/validators/posts'
 import { createPost } from '@/data-access/posts'
 import { NextResponse } from 'next/server'

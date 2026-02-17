@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { useRouter } from 'next/navigation'
-import { ApiClient } from '@/lib/api-client'
+import { ApiClient } from '@/lib/api/api-client'
 
 interface PostModerationActionsProps {
   postId: string

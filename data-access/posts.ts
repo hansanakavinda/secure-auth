@@ -1,4 +1,4 @@
-import { ApiError } from "@/lib/api-utils"
+import { ApiError } from "@/lib/api/api-utils"
 import { prisma } from "@/lib/prisma"
 
 export const moderatePost = async ({ postId, action }: { postId: string, action: 'approve' | 'reject' }) => {

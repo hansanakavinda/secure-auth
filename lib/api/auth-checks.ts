@@ -2,7 +2,7 @@ import type { Session } from 'next-auth'
 import type { Role } from '@/types/auth'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { ApiError } from '@/lib/api-utils'
+import { ApiError } from '@/lib/api/api-utils'
 
 /**
  * SECURITY: Freshness Check for High-Risk Operations

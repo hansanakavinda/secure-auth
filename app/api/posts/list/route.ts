@@ -1,4 +1,4 @@
-import { asyncCatcher } from '@/lib/api-utils'
+import { asyncCatcher } from '@/lib/api/api-utils'
 import { getApprovedPostsPaginated } from '@/data-access/posts'
 import { NextResponse } from 'next/server'
 

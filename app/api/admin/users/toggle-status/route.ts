@@ -1,5 +1,5 @@
-import { requireFreshAuth } from '@/lib/auth-checks'
-import { asyncCatcher, validateRequest } from '@/lib/api-utils'
+import { requireFreshAuth } from '@/lib/api/auth-checks'
+import { asyncCatcher, validateRequest } from '@/lib/api/api-utils'
 import { toggleStatusSchema } from '@/lib/validators/admin-users'
 import { toggleUserStatus } from '@/data-access/users'
 import { NextResponse } from 'next/server'
