@@ -16,6 +16,7 @@ export function LoginForm() {
     const [isLoading, setIsLoading] = useState(false)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [confirmEmail, setConfirmEmail] = useState('')
     const [formError, setFormError] = useState('')
 
     const handleCredentialsLogin = async (e: React.FormEvent) => {
@@ -27,6 +28,7 @@ export function LoginForm() {
             const result = await signIn('credentials', {
                 email,
                 password,
+                confirm_email: confirmEmail,
                 redirect: false,
             })
 
@@ -115,6 +117,23 @@ export function LoginForm() {
                                 required
                                 disabled={isLoading}
                             />
+
+                            {/* Honeypot field — invisible to humans, traps bots */}
+                            <div
+                                className="sr-only absolute -left-[9999px] -top-[9999px]"
+                                aria-hidden="true"
+                            >
+                                <Input
+                                    label="Confirm Email"
+                                    type="email"
+                                    name="confirm_email"
+                                    placeholder="you@example.com"
+                                    value={confirmEmail}
+                                    onChange={(e) => setConfirmEmail(e.target.value)}
+                                    tabIndex={-1}
+                                    autoComplete="off"
+                                />
+                            </div>
 
                             <Input
                                 label="Password"

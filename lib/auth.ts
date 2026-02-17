@@ -46,8 +46,15 @@ export const authConfig: NextAuthConfig = {
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        confirm_email: { label: "Confirm Email", type: "email" },
       },
       async authorize(credentials) {
+
+        // SECURITY: Honeypot check — runs BEFORE rate limiter and DB query
+        // to reject bot submissions with minimal resource usage.
+        if (credentials?.confirm_email) {
+          throw new CredentialsSignin()
+        }
 
         if (!credentials?.email || !credentials?.password) {
           return null
