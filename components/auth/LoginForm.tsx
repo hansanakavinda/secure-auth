@@ -194,15 +194,7 @@ export function LoginForm() {
                             <span>Sign in with Google</span>
                         </Button>
 
-                        {/* Demo Credentials */}
-                        <div className="mt-6 p-4 rounded-xl bg-[#F5F5F4] border border-[#E5E5E4]">
-                            <p className="text-xs font-medium text-[#4B3621] mb-2">Demo Credentials:</p>
-                            <div className="space-y-1 text-xs text-gray-600">
-                                <p>Super Admin: superadmin@example.com / SuperAdmin123!</p>
-                                <p>Admin: admin@example.com / Admin123!</p>
-                                <p>User: user@example.com / User123!</p>
-                            </div>
-                        </div>
+
                     </CardContent>
 
 

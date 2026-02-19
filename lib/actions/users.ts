@@ -3,9 +3,13 @@
 import { createUser } from '@/data-access/users'
 import { ApiError } from '@/lib/api/api-utils'
 import type { Role } from '@/types/auth'
+import { requireFreshAuth } from '../api/auth-checks'
 
 export async function createUserAction(formData: FormData) {
   try {
+
+    await requireFreshAuth({ roles: ['SUPER_ADMIN'] })
+
     const name = formData.get('name') as string
     const email = formData.get('email') as string
     const password = formData.get('password') as string

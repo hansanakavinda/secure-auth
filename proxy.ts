@@ -20,7 +20,6 @@ export function proxy(request: NextRequest) {
 
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('x-nonce', nonce);
-  requestHeaders.set('Content-Security-Policy', cspHeader);
 
   const response = NextResponse.next({
     request: {
@@ -28,8 +27,15 @@ export function proxy(request: NextRequest) {
     },
   });
 
-  // Set the header on the response so ZAP can see it
   response.headers.set('Content-Security-Policy', cspHeader);
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  response.headers.set('X-Permitted-Cross-Domain-Policies', 'none');
+
+
   return response;
 }
 
