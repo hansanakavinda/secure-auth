@@ -30,15 +30,15 @@ export function LoginForm() {
                 password,
                 confirm_email: confirmEmail,
                 redirect: false,
+                redirectTo: callbackUrl
             })
 
             if (result?.error) {
-                console.log('Login error:', result)
                 setFormError(getErrorMessage(result.code ?? result.error) || result.error)
             } else if (result?.ok) {
                 router.push(callbackUrl)
-                router.refresh()
             }
+
         } catch (err) {
             setFormError('An unexpected error occurred. Please try again.')
         } finally {

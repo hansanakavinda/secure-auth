@@ -1,5 +1,6 @@
 import { LoginForm } from '../../components/auth/LoginForm'
-
+import getSession from '@/lib/getSession'
+import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 
 const LoginFallback = () => (
@@ -9,7 +10,12 @@ const LoginFallback = () => (
   </div>
 );
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  const session = await getSession()
+  if (session) {
+    redirect('/dashboard')
+  }
+
   return (
     <Suspense fallback={<LoginFallback />}>
       <LoginForm />

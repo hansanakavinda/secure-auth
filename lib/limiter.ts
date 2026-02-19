@@ -38,8 +38,8 @@ interface DualGuardConfig {
 // Defaults – 15-minute window
 // ---------------------------------------------------------------------------
 const DEFAULT_CONFIG: DualGuardConfig = {
-  ipLimit: 5,
-  emailLimit: 2,
+  ipLimit: 50,
+  emailLimit: 5,
   windowMs: 15 * 60 * 1000, // 15 minutes
 }
 
