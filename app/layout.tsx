@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
+import { headers } from "next/headers";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -17,17 +19,25 @@ export const metadata: Metadata = {
   description: "Next.js authentication system with role-based access control",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+  const headerList = await headers();
+  const nonce = headerList.get('x-nonce') || '';
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <script
+          nonce={nonce}
+          suppressHydrationWarning
+        />
       </body>
     </html>
   );

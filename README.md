@@ -42,6 +42,13 @@ Strategy: Server-side "Freshness Checks."
 
 Mechanism: Critical administrative actions (e.g., moderatePost) perform a direct database query for the user's isActive status and role before execution, bypassing the JWT state entirely for high-stakes operations.
 
+6. Content Security Policy (CSP)
+Strategy: Strict Content Security Policy with dynamic nonce generation.
+
+Mechanism: A random nonce is generated for each request and included in the Content-Security-Policy header.
+
+Benefit: Prevents Cross-Site Scripting (XSS) attacks by ensuring scripts are only executed from trusted sources.
+
 🛠️ Tech Stack
 Framework: Next.js 16 (App Router)
 

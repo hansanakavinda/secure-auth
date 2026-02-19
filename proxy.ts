@@ -1,64 +1,46 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
-import { auth } from '@/lib/auth'
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-// Define protected routes
-const protectedRoutes = ['/dashboard', '/admin', '/posts/new']
-const adminRoutes = ['/admin']
-const superAdminRoutes = ['/admin/users']
+export function proxy(request: NextRequest) {
+  const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
 
-export async function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl
+  const cspHeader = `
+    default-src 'self';
+    script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://accounts.google.com;
+    style-src 'self' 'unsafe-inline';
+    img-src 'self' blob: data: https://lh3.googleusercontent.com https://*.googleusercontent.com;
+    font-src 'self';
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+    frame-ancestors 'none';
+    connect-src 'self' https://accounts.google.com;
+    upgrade-insecure-requests;
+  `.replace(/\s{2,}/g, ' ').trim();
 
-  // Get session
-  const session = await auth()
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-nonce', nonce);
+  requestHeaders.set('Content-Security-Policy', cspHeader);
 
-  // Check if route is protected
-  const isProtectedRoute = protectedRoutes.some(route => 
-    pathname.startsWith(route)
-  )
+  const response = NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
 
-  // Redirect to login if not authenticated
-  if (isProtectedRoute && !session) {
-    const loginUrl = new URL('/login', request.url)
-    loginUrl.searchParams.set('callbackUrl', pathname)
-    return NextResponse.redirect(loginUrl)
-  }
-
-  // Check if user is active
-  if (session && !session.user.isActive) {
-    return NextResponse.redirect(new URL('/login?error=AccountDeactivated', request.url))
-  }
-
-  // Check admin routes
-  const isAdminRoute = adminRoutes.some(route => pathname.startsWith(route))
-  if (isAdminRoute && session) {
-    const isAdmin = session.user.role === 'ADMIN' || session.user.role === 'SUPER_ADMIN'
-    if (!isAdmin) {
-      return NextResponse.redirect(new URL('/dashboard?error=Unauthorized', request.url))
-    }
-  }
-
-  // Check super admin routes
-  const isSuperAdminRoute = superAdminRoutes.some(route => pathname.startsWith(route))
-  if (isSuperAdminRoute && session) {
-    if (session.user.role !== 'SUPER_ADMIN') {
-      return NextResponse.redirect(new URL('/admin?error=SuperAdminOnly', request.url))
-    }
-  }
-
-  return NextResponse.next()
+  // Set the header on the response so ZAP can see it
+  response.headers.set('Content-Security-Policy', cspHeader);
+  return response;
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    '/((?!_next/static|_next/image|favicon.ico|public).*)',
+    {
+      source: '/((?!api|_next/static|_next/image|favicon.ico|public).*)',
+      missing: [
+        { type: 'header', key: 'next-router-prefetch' },
+        { type: 'header', key: 'next-router-state-tree' },
+      ],
+    },
   ],
-}
+};
