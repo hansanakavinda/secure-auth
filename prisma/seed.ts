@@ -1,5 +1,5 @@
-import { prisma } from '@/lib/prisma'
 import 'dotenv/config';
+import { prisma } from '@/lib/prisma'
 
 import { hash } from 'bcryptjs';
 
@@ -8,7 +8,7 @@ async function main() {
 
   const passwrord = process.env.SUPER_ADMIN_PASSWORD;
   const email = process.env.SUPER_ADMIN_EMAIL;
-  
+
   if (!passwrord || !email) {
     throw new Error('SUPER_ADMIN_PASSWORD or SUPER_ADMIN_EMAIL environment variable is not set');
   }
@@ -17,7 +17,7 @@ async function main() {
 
   // Create Super Admin
   const hashedPassword = await hash(passwrord, 12);
-  
+
   const superAdmin = await prisma.user.upsert({
     where: { email: email },
     update: {},
