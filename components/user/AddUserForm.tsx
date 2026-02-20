@@ -44,8 +44,8 @@ export function AddUserForm() {
     try {
 
       const formData = new FormData()
-      formData.append('name', name)
-      formData.append('email', email)
+      formData.append('name', name.trim())
+      formData.append('email', email.trim().toLowerCase())
       formData.append('password', password)
       formData.append('role', role)
 

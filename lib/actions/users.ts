@@ -24,6 +24,10 @@ export async function createUserAction(formData: FormData) {
       return { success: false, error: 'Password must be at least 8 characters' }
     }
 
+    if (password.length > 128) {
+      return { success: false, error: 'Password must be at most 128 characters' }
+    }
+
     // Use existing data-access function
     const result = await createUser({ name, email, password, role })
     return { success: true, data: result }

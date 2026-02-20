@@ -1,4 +1,4 @@
-import { PrismaClient } from "../src/generated/prisma/client"; // Use your custom output path
+import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 
@@ -12,8 +12,8 @@ const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
 // 3. In Prisma 7, you MUST pass the adapter to the constructor
 export const prisma =
-  globalForPrisma.prisma || 
-  new PrismaClient({ 
+  globalForPrisma.prisma ||
+  new PrismaClient({
     adapter,
     // log: ['query'] // Optional: useful for debugging in dev
   });
