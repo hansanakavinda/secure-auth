@@ -1,7 +1,18 @@
 Secure Auth 
 A production-ready, highly secure authentication system built with Next.js 16, Auth.js v5 (Beta), and Prisma 7. This project goes beyond standard login/signup by implementing a multi-layered defense strategy against common web vulnerabilities.
 
-Security Features
+## Environment Variables
+
+DATABASE_URL=
+AUTH_SECRET=
+NEXTAUTH_URL=
+TRUST_HOSTS=
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+SUPER_ADMIN_EMAIL=
+SUPER_ADMIN_PASSWORD=
+
+## Security Features
 
 1. Bot Protection (Honeypot Trap)
 Strategy: Implements an invisible "trap" field within the login form.

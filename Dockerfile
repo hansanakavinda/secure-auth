@@ -44,7 +44,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 # Copy generated Prisma client (required at runtime)
-COPY --from=builder --chown=nextjs:nodejs /app/src/generated/prisma ./src/generated/prisma
+COPY --from=builder --chown=nextjs:nodejs /app/prisma/generated ./prisma/generated
 
 # Copy Prisma schema (needed for runtime query engine resolution)
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
