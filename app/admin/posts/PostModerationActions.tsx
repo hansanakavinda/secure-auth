@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { useRouter } from 'next/navigation'
+import { useToast } from '@/components/ui/Toast'
 import { ApiClient } from '@/lib/api/api-client'
 
 interface PostModerationActionsProps {
@@ -11,6 +12,7 @@ interface PostModerationActionsProps {
 
 export function PostModerationActions({ postId }: PostModerationActionsProps) {
   const router = useRouter()
+  const toast = useToast()
   const [isLoading, setIsLoading] = useState(false)
 
   const handleApprove = async () => {
@@ -23,8 +25,9 @@ export function PostModerationActions({ postId }: PostModerationActionsProps) {
 
       if (result.ok) {
         router.refresh()
+        toast.success('Post approved successfully')
       } else {
-        alert(result.error || 'Failed to approve post')
+        toast.error(result.error || 'Failed to approve post')
       }
     } finally {
       setIsLoading(false)
@@ -45,8 +48,9 @@ export function PostModerationActions({ postId }: PostModerationActionsProps) {
 
       if (result.ok) {
         router.refresh()
+        toast.success('Post rejected successfully')
       } else {
-        alert(result.error || 'Failed to reject post')
+        toast.error(result.error || 'Failed to reject post')
       }
     } finally {
       setIsLoading(false)

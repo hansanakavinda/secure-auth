@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Modal } from '@/components/ui/Modal'
+import { useToast } from '@/components/ui/Toast'
 import type { Role } from '@/types/auth'
 
 // example
@@ -14,6 +15,7 @@ const roles: Role[] = ['USER', 'ADMIN', 'SUPER_ADMIN']
 
 export function AddUserForm() {
   const router = useRouter()
+  const toast = useToast()
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [name, setName] = useState('')
@@ -52,26 +54,15 @@ export function AddUserForm() {
       const result = await createUserAction(formData)
 
       if (!result.success) {
-        setError(result.error || 'Failed to create user')
+        toast.error(result.error || 'Failed to create user')
         return
       }
 
-      // const response = await fetch('/api/admin/users/create', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ name, email, password, role }),
-      // })
-
-      // if (!response.ok) {
-      //   const payload = await response.json().catch(() => null)
-      //   setError(payload?.error || 'Failed to create user')
-      //   return
-      // }
-
       handleClose()
       router.refresh()
+      toast.success('User created successfully')
     } catch (err) {
-      setError('An unexpected error occurred. Please try again.')
+      toast.error('An unexpected error occurred. Please try again.')
     } finally {
       setIsLoading(false)
     }

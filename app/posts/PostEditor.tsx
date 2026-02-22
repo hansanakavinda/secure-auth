@@ -4,10 +4,12 @@ import { useState } from 'react'
 import { Modal } from '@/components/ui/Modal'
 import { Button } from '@/components/ui/Button'
 import { Input, Textarea } from '@/components/ui/Input'
+import { useToast } from '@/components/ui/Toast'
 import { useRouter } from 'next/navigation'
 
 export function PostEditor() {
   const router = useRouter()
+  const toast = useToast()
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [title, setTitle] = useState('')
@@ -36,10 +38,10 @@ export function PostEditor() {
         setContent('')
         setIsOpen(false)
         router.refresh()
-        alert('Post submitted for review! An admin will approve it soon.')
+        toast.info('Post submitted for review! An admin will approve it soon.')
       } else {
         const data = await response.json()
-        setError(data.error || 'Failed to create post')
+        toast.error(data.error || 'Failed to create post')
       }
     } catch (err) {
       setError(`An unexpected error occurred: ${err}`)

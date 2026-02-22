@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { useRouter } from 'next/navigation'
+import { useToast } from '@/components/ui/Toast'
 
 import { Role } from '@/types/auth'
 
@@ -22,11 +23,12 @@ export function UserManagementActions({
   isCurrentUser,
 }: UserManagementActionsProps) {
   const router = useRouter()
+  const toast = useToast()
   const [isLoading, setIsLoading] = useState(false)
 
   const handleToggleStatus = async () => {
     if (isCurrentUser) {
-      alert('You cannot deactivate your own account')
+      toast.warning('You cannot deactivate your own account')
       return
     }
 
@@ -44,11 +46,12 @@ export function UserManagementActions({
 
       if (response.ok) {
         router.refresh()
+        toast.success(`User ${isActive ? 'deactivated' : 'activated'} successfully`)
       } else {
-        alert('Failed to update user status')
+        toast.error('Failed to update user status')
       }
     } catch (error) {
-      alert(`An error occurred: ${error}`)
+      toast.error(`An error occurred while updating user status`)
     } finally {
       setIsLoading(false)
     }
@@ -56,7 +59,7 @@ export function UserManagementActions({
 
   const handleChangeRole = async (newRole: Role) => {
     if (isCurrentUser && newRole !== 'SUPER_ADMIN') {
-      alert('You cannot change your own role')
+      toast.warning('You cannot change your own role')
       return
     }
 
@@ -74,11 +77,12 @@ export function UserManagementActions({
 
       if (response.ok) {
         router.refresh()
+        toast.success(`User role updated to ${newRole.replace('_', ' ')}`)
       } else {
-        alert('Failed to update user role')
+        toast.error('Failed to update user role')
       }
     } catch (error) {
-      alert(`An error occurred: ${error}`)
+      toast.error('An error occurred while changing user role')
     } finally {
       setIsLoading(false)
     }
