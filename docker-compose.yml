@@ -1,8 +1,30 @@
 services:
   app:
     build: .
-    ports:
-      - "3000:3000"
-    env_file:
-      - .env
     restart: unless-stopped
+    env_file: .env
+    networks:
+      - secure_auth_net
+
+  caddy:
+    image: caddy:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - SITE_ADDRESS=${SITE_ADDRESS}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - secure_auth_net
+
+networks:
+  secure_auth_net:
+
+
+volumes:
+  caddy_data:
+  caddy_config:
