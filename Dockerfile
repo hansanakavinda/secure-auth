@@ -46,11 +46,18 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # Copy generated Prisma client (required at runtime)
 COPY --from=builder --chown=nextjs:nodejs /app/prisma/generated ./prisma/generated
 
-# Copy Prisma schema (needed for runtime query engine resolution)
+# Copy Prisma schema and migrations (needed for runtime + migrate deploy)
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+
+# Copy prisma config (needed for db push)
+COPY --from=builder --chown=nextjs:nodejs /app/prisma.config.ts ./
+
+# Install prisma CLI + dotenv (needed at runtime for db push via prisma.config.ts)
+RUN npm install dotenv --save-prod
 
 USER nextjs
 
 EXPOSE 3000
 
-CMD ["node", "server.js"]
+CMD ["sh", "-c", "npx prisma db push && node server.js"]
+
