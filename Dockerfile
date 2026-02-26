@@ -52,7 +52,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 # Copy prisma config (needed for db push)
 COPY --from=builder --chown=nextjs:nodejs /app/prisma.config.ts ./
 
-# Install prisma CLI + dotenv (needed at runtime for db push via prisma.config.ts)
+# Copy production seed script (run manually: docker compose exec app node seed-admin.cjs)
+COPY --from=builder --chown=nextjs:nodejs /app/seed-admin.cjs ./
+
+# Install runtime deps for db push + seed
 RUN npm install dotenv --save-prod
 
 USER nextjs
