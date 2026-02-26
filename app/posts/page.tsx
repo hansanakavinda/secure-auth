@@ -27,6 +27,7 @@ export default async function PostsPage() {
             <div>
               <h1 className="text-4xl font-bold text-[#4B3621] mb-2">Public Post Wall</h1>
               <p className="text-gray-600">Share your thoughts with the community</p>
+              <p className="text-gray-600">Testing auto deployment</p>
             </div>
             {session && <div className='flex gap-4 items-center'>
               <PostEditor />
