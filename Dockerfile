@@ -36,31 +36,22 @@ ENV HOSTNAME="0.0.0.0"
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Copy public assets
+# Images and assets
 COPY --from=builder /app/public ./public
 
-# Copy standalone build output
+# Server.js and minimal node modules
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+
+# CSS and JS files
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copy generated Prisma client (required at runtime)
-COPY --from=builder --chown=nextjs:nodejs /app/prisma/generated ./prisma/generated
-
-# Copy Prisma schema and migrations (needed for runtime + migrate deploy)
+# Prisma files (for manual db push / migrate when needed)
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
-
-# Copy prisma config (needed for db push)
 COPY --from=builder --chown=nextjs:nodejs /app/prisma.config.ts ./
-
-# Copy production seed script (run manually: docker compose exec app node seed-admin.cjs)
-COPY --from=builder --chown=nextjs:nodejs /app/seed-admin.cjs ./
-
-# Install runtime deps for db push + seed
-RUN npm install dotenv --save-prod
 
 USER nextjs
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "npx prisma db push && node server.js"]
+CMD ["node", "server.js"]
 

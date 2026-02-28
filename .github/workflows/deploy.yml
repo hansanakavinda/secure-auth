@@ -18,4 +18,4 @@ jobs:
             cd ~/secure-auth
             git pull origin main
             docker compose up -d --build 2>&1
-            docker image prune -f
+            docker system prune -f
