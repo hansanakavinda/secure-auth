@@ -45,10 +45,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 # CSS and JS files
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Prisma files (for manual db push / migrate when needed)
-COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
-COPY --from=builder --chown=nextjs:nodejs /app/prisma.config.ts ./
-
 USER nextjs
 
 EXPOSE 3000

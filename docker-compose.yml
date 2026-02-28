@@ -28,6 +28,18 @@ services:
     networks:
       - secure_auth_net
 
+  db-tools:
+    build:
+      context: .
+      target: builder
+    env_file: .env
+    profiles: [ "tools" ]
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - secure_auth_net
+
   caddy:
     image: caddy:latest
     restart: unless-stopped
